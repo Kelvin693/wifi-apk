@@ -17,12 +17,16 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt update
-          # 用 libtinfo6 替代旧的 libtinfo5，并加上关键依赖
           sudo apt install -y git zip unzip openjdk-11-jdk python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libtinfo6 cmake libffi-dev libssl-dev
           pip install buildozer==1.5.0 cython==0.29.36 setuptools==65.7.0
 
       - name: Build APK
-        run: buildozer android debug
+        run: |
+          # 自动同意 Android SDK 许可协议
+          echo "y" | buildozer android debug --verbose
+        env:
+          # 强制同意协议，避免交互式输入
+          BUILDOZER_ANDROID_SDK_ACCEPT_LICENSE: "y"
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
